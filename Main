@@ -7,30 +7,91 @@ servers:
     description: Dev server
 paths:
   /orders:
-      get:
-        summary: Метод получения списка записей
-        tags:
+    get:
+      summary: Метод получения списка записей
+      tags:
         - Orders
-        operationId: getAllOrders
-        responses:
-            '200':
-            description: Успешный ответ со списком записей
-            content:
-              application/json:
+      operationId: getAllOrders
+      responses:
+        '200':
+          description: Успешный ответ со списком записей
+          content:
+            application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Orders'
-            'default':
-            description: Беда бедовая
-            content:
-              application/json:
+                  $ref: '#/components/schemas/Order'
+        '400':
+          description: Ошибка запроса
+          content:
+            application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Error'  
-              
-              
+                $ref: '#/components/schemas/Error'
+                
+    post:                                                                 
+      summary: Создание записи
+      tags:
+        - Orders
+      operationId: createOrder    
+      requestBody:
+        required: true
+        content:
+        application/json:
+            schema:
+                $ref: '#/components/schemas/Order'
+      responses:
+        '200':
+          description: Успешный ответ с созданием записи
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/Order'
+        '400':
+          description: Ошибка запроса
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /orders/{order_id}:                                              
+    get:                                                                 
+      summary: Метод получения списка записей по идентификатору
+      tags:
+        - Orders
+      operationId: getOrderById
+      parameters:
+          - name: order_id
+            in: path
+            required: true
+            description: Идентификатор записи
+            schema:
+                type: string
+            example: 1
+      responses:
+        '200':
+          description: Успешный ответ с одной записью
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/Order'
+        '400':
+          description: Ошибка запроса
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'                
+                
+    delete:
+        summary: Метод удаления записи по идентификатору
+      tags:
+        - Orders
+        operationId: deleteOrderById
+         parameters:
+          - name: order_id
+            in: path
+            required: true
+            description: Идентификатор записи
+            schema:
+                type: string
+            example: 1
+      
 components:
   schemas:
     Order:
@@ -47,15 +108,15 @@ components:
         - created_at
         - status
       properties:
-      order_id:
+        order_id:
           type: string
-        example: 1
+          example: 1
         name:
           type: string
           example: Alex
         phone:
           type: string
-          example: +7 (999) 999 99-99
+          example: '+7 (999) 999 99-99'
         car_brand:
           type: string
           example: Reno Logan
@@ -64,7 +125,8 @@ components:
           example: Уборка Кузова
         recording_time:
           type: string
-          format: 2025-01-20T15:00:00+1
+          format: date-time
+          example: 2025-01-20T15:00:00+01:00
         box_number:
           type: string
           example: 1
@@ -72,30 +134,28 @@ components:
           type: string
           example: 2
         discount:
-          type: string
-          example: 4200
+          type: boolean
+          example: true
         created_at:
           type: string
-          format: 2025-01-20T15:00:00+1
+          format: date-time
+          example: 2025-01-20T15:00:00+01:00
         status:
           type: string
           enum:
-          - active
-          - waiting
-          - completed
+            - active
+            - waiting
+            - completed
           description: Статус Записи
-        Orders:
-        type: array
-        items:
-        $ref: "#/components/schemas/Order"
-        
     Error:
-        type: object
-        required:
+      type: object
+      required:
         - code
         - message
-        properties:
-            code:
-              type: integer
-            message:
-              type: string
+      properties:
+        code:
+          type: integer
+          example: 400
+        message:
+          type: string
+          example: "Беда"
